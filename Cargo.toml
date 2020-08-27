@@ -1,0 +1,14 @@
+[package]
+name = "RaionNative"
+version = "0.1.0"
+authors = ["mastercooker <cookiedragon234@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "RaionNative"
+crate_type = ["cdylib"]
+
+[dependencies]
+libc = "0.2.7"
+jni = "0.17.0"
+obfstr = "0.1.1"

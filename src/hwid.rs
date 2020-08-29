@@ -8,8 +8,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::Read;
 use std::process::Command;
-use obfstr::{obfstr, obflocal};
-use std::borrow::Borrow;
+use obfstr::{obfstr};
 
 #[cfg(target_os = "windows")]
 pub fn get_id() -> std::string::String {
@@ -31,21 +30,21 @@ pub fn get_id() -> std::string::String {
 	let mut id = String::new();
 	let mut path: String = obfstr!("/etc/machine-id").to_owned();
 	if Path::new(&path).exists() {
-		File::open(&path).unwrap().read_to_string(&mut id);
+		File::open(&path).unwrap().read_to_string(&mut id).unwrap();
 	} else {
 		path = obfstr!("/etc/machine-id").to_owned();
 		if Path::new(&path).exists() {
-			File::open(&path).unwrap().read_to_string(&mut id);
+			File::open(&path).unwrap().read_to_string(&mut id).unwrap();
 		}
 	}
 	
 	let output = Command::new(obfstr!("lsblk"))
 		.arg(obfstr!("-nro")).arg(obfstr!("SERIAL"))
 		.output().expect(obfstr!("Failed to get HWID"));
-	let diskSerial = String::from_utf8(output.stdout);
+	let disk_serial = String::from_utf8(output.stdout);
 	
-	if diskSerial.is_ok() {
-		id.push_str(diskSerial.unwrap().as_str());
+	if disk_serial.is_ok() {
+		id.push_str(disk_serial.unwrap().as_str());
 		return id;
 	}
 	return id;

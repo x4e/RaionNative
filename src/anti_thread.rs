@@ -1,12 +1,8 @@
-use crate::jvmti::{jvmtiThreadGroupInfo, jvmtiThreadInfo, jvmtiEnv, jthread, jvmtiError_JVMTI_ERROR_NONE};
-use std::fmt::{Formatter, Display};
-use core::fmt;
-use std::ffi::{CStr, CString};
-use jni::sys::{JNINativeInterface_, jint};
-use std::ptr::null_mut;
+use crate::jvmti::{jvmtiThreadInfo, jvmtiEnv, jthread, jvmtiError_JVMTI_ERROR_NONE};
+use std::ffi::{CStr};
+use jni::sys::{JNINativeInterface_};
 use std::mem::zeroed;
-use std::borrow::BorrowMut;
-use std::os::raw::{c_char, c_uchar};
+use std::os::raw::{c_uchar};
 use obfstr::{obfstr};
 
 pub unsafe fn shutdown_attach_listener(jvmti: *mut jvmtiEnv, thread: jthread) {

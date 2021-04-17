@@ -12,6 +12,7 @@ crate_type = ["cdylib"]
 libc = "0.2.7"
 jni = "0.17.0"
 obfstr = "0.1.1"
+
 [target.'cfg(windows)'.dependencies]
 winreg = "0.6"
-#hwid = { git = "https://github.com/cookiedragon234/rust-hwid/" }
+winapi = "0.3.9"

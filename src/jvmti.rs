@@ -4,105 +4,29 @@
 #![allow(dead_code)]
 
 use jni::sys::{jint, jobject, JNINativeInterface_, jlong, jmethodID, jclass, jboolean, JNIEnv, jfieldID, jvalue, jfloat, jdouble, jchar};
+use crate::bitfield::__BindgenBitfieldUnit;
 
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct __BindgenBitfieldUnit<Storage, Align> {
-	storage: Storage,
-	align: [Align; 0],
-}
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align> {
-	#[inline]
-	pub const fn new(storage: Storage) -> Self {
-		Self { storage, align: [] }
-	}
-}
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
-	where
-		Storage: AsRef<[u8]> + AsMut<[u8]>,
-{
-	#[inline]
-	pub fn get_bit(&self, index: usize) -> bool {
-		debug_assert!(index / 8 < self.storage.as_ref().len());
-		let byte_index = index / 8;
-		let byte = self.storage.as_ref()[byte_index];
-		let bit_index = if cfg!(target_endian = "big") {
-			7 - (index % 8)
-		} else {
-			index % 8
-		};
-		let mask = 1 << bit_index;
-		byte & mask == mask
-	}
-	#[inline]
-	pub fn set_bit(&mut self, index: usize, val: bool) {
-		debug_assert!(index / 8 < self.storage.as_ref().len());
-		let byte_index = index / 8;
-		let byte = &mut self.storage.as_mut()[byte_index];
-		let bit_index = if cfg!(target_endian = "big") {
-			7 - (index % 8)
-		} else {
-			index % 8
-		};
-		let mask = 1 << bit_index;
-		if val {
-			*byte |= mask;
-		} else {
-			*byte &= !mask;
-		}
-	}
-	#[inline]
-	pub fn get(&self, bit_offset: usize, bit_width: u8) -> u64 {
-		debug_assert!(bit_width <= 64);
-		debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-		debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
-		let mut val = 0;
-		for i in 0..(bit_width as usize) {
-			if self.get_bit(i + bit_offset) {
-				let index = if cfg!(target_endian = "big") {
-					bit_width as usize - 1 - i
-				} else {
-					i
-				};
-				val |= 1 << index;
-			}
-		}
-		val
-	}
-	#[inline]
-	pub fn set(&mut self, bit_offset: usize, bit_width: u8, val: u64) {
-		debug_assert!(bit_width <= 64);
-		debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-		debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
-		for i in 0..(bit_width as usize) {
-			let mask = 1 << i;
-			let val_bit_is_set = val & mask == mask;
-			let index = if cfg!(target_endian = "big") {
-				bit_width as usize - 1 - i
-			} else {
-				i
-			};
-			self.set_bit(index + bit_offset, val_bit_is_set);
-		}
-	}
-}
 pub const JVMTI_VERSION_1: _bindgen_ty_1 = 805371904;
 pub const JVMTI_VERSION_1_0: _bindgen_ty_1 = 805371904;
 pub const JVMTI_VERSION_1_1: _bindgen_ty_1 = 805372160;
 pub const JVMTI_VERSION_1_2: _bindgen_ty_1 = 805372416;
 pub const JVMTI_VERSION: _bindgen_ty_1 = 805372417;
+
 pub type _bindgen_ty_1 = u32;
 pub type jvmtiEnv = *const jvmtiInterface_1_;
 pub type jthread = jobject;
 pub type jthreadGroup = jobject;
 pub type jlocation = jlong;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jrawMonitorID {
 	_unused: [u8; 0],
 }
+
 pub type jrawMonitorID = *mut _jrawMonitorID;
 pub type jniNativeInterface = JNINativeInterface_;
+
 pub const JVMTI_THREAD_STATE_ALIVE: _bindgen_ty_2 = 1;
 pub const JVMTI_THREAD_STATE_TERMINATED: _bindgen_ty_2 = 2;
 pub const JVMTI_THREAD_STATE_RUNNABLE: _bindgen_ty_2 = 4;
@@ -119,7 +43,9 @@ pub const JVMTI_THREAD_STATE_IN_NATIVE: _bindgen_ty_2 = 4194304;
 pub const JVMTI_THREAD_STATE_VENDOR_1: _bindgen_ty_2 = 268435456;
 pub const JVMTI_THREAD_STATE_VENDOR_2: _bindgen_ty_2 = 536870912;
 pub const JVMTI_THREAD_STATE_VENDOR_3: _bindgen_ty_2 = 1073741824;
+
 pub type _bindgen_ty_2 = u32;
+
 pub const JVMTI_JAVA_LANG_THREAD_STATE_MASK: _bindgen_ty_3 = 1207;
 pub const JVMTI_JAVA_LANG_THREAD_STATE_NEW: _bindgen_ty_3 = 0;
 pub const JVMTI_JAVA_LANG_THREAD_STATE_TERMINATED: _bindgen_ty_3 = 2;
@@ -127,19 +53,27 @@ pub const JVMTI_JAVA_LANG_THREAD_STATE_RUNNABLE: _bindgen_ty_3 = 5;
 pub const JVMTI_JAVA_LANG_THREAD_STATE_BLOCKED: _bindgen_ty_3 = 1025;
 pub const JVMTI_JAVA_LANG_THREAD_STATE_WAITING: _bindgen_ty_3 = 145;
 pub const JVMTI_JAVA_LANG_THREAD_STATE_TIMED_WAITING: _bindgen_ty_3 = 161;
+
 pub type _bindgen_ty_3 = u32;
+
 pub const JVMTI_THREAD_MIN_PRIORITY: _bindgen_ty_4 = 1;
 pub const JVMTI_THREAD_NORM_PRIORITY: _bindgen_ty_4 = 5;
 pub const JVMTI_THREAD_MAX_PRIORITY: _bindgen_ty_4 = 10;
+
 pub type _bindgen_ty_4 = u32;
+
 pub const JVMTI_HEAP_FILTER_TAGGED: _bindgen_ty_5 = 4;
 pub const JVMTI_HEAP_FILTER_UNTAGGED: _bindgen_ty_5 = 8;
 pub const JVMTI_HEAP_FILTER_CLASS_TAGGED: _bindgen_ty_5 = 16;
 pub const JVMTI_HEAP_FILTER_CLASS_UNTAGGED: _bindgen_ty_5 = 32;
+
 pub type _bindgen_ty_5 = u32;
+
 pub const JVMTI_VISIT_OBJECTS: _bindgen_ty_6 = 256;
 pub const JVMTI_VISIT_ABORT: _bindgen_ty_6 = 32768;
+
 pub type _bindgen_ty_6 = u32;
+
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_CLASS: jvmtiHeapReferenceKind = 1;
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_FIELD: jvmtiHeapReferenceKind = 2;
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_ARRAY_ELEMENT: jvmtiHeapReferenceKind = 3;
@@ -157,7 +91,9 @@ pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_STACK_LOCAL: jvmtiHeapRefe
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_JNI_LOCAL: jvmtiHeapReferenceKind = 25;
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_THREAD: jvmtiHeapReferenceKind = 26;
 pub const jvmtiHeapReferenceKind_JVMTI_HEAP_REFERENCE_OTHER: jvmtiHeapReferenceKind = 27;
+
 pub type jvmtiHeapReferenceKind = u32;
+
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_BOOLEAN: jvmtiPrimitiveType = 90;
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_BYTE: jvmtiPrimitiveType = 66;
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_CHAR: jvmtiPrimitiveType = 67;
@@ -166,11 +102,15 @@ pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_INT: jvmtiPrimitiveType = 73;
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_LONG: jvmtiPrimitiveType = 74;
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_FLOAT: jvmtiPrimitiveType = 70;
 pub const jvmtiPrimitiveType_JVMTI_PRIMITIVE_TYPE_DOUBLE: jvmtiPrimitiveType = 68;
+
 pub type jvmtiPrimitiveType = u32;
+
 pub const jvmtiHeapObjectFilter_JVMTI_HEAP_OBJECT_TAGGED: jvmtiHeapObjectFilter = 1;
 pub const jvmtiHeapObjectFilter_JVMTI_HEAP_OBJECT_UNTAGGED: jvmtiHeapObjectFilter = 2;
 pub const jvmtiHeapObjectFilter_JVMTI_HEAP_OBJECT_EITHER: jvmtiHeapObjectFilter = 3;
+
 pub type jvmtiHeapObjectFilter = u32;
+
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_JNI_GLOBAL: jvmtiHeapRootKind = 1;
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_SYSTEM_CLASS: jvmtiHeapRootKind = 2;
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_MONITOR: jvmtiHeapRootKind = 3;
@@ -178,7 +118,9 @@ pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_STACK_LOCAL: jvmtiHeapRootKind = 4;
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_JNI_LOCAL: jvmtiHeapRootKind = 5;
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_THREAD: jvmtiHeapRootKind = 6;
 pub const jvmtiHeapRootKind_JVMTI_HEAP_ROOT_OTHER: jvmtiHeapRootKind = 7;
+
 pub type jvmtiHeapRootKind = u32;
+
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_CLASS: jvmtiObjectReferenceKind = 1;
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_FIELD: jvmtiObjectReferenceKind = 2;
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_ARRAY_ELEMENT: jvmtiObjectReferenceKind = 3;
@@ -188,21 +130,29 @@ pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_PROTECTION_DOMAIN: jvmtiObjec
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_INTERFACE: jvmtiObjectReferenceKind = 7;
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_STATIC_FIELD: jvmtiObjectReferenceKind = 8;
 pub const jvmtiObjectReferenceKind_JVMTI_REFERENCE_CONSTANT_POOL: jvmtiObjectReferenceKind = 9;
+
 pub type jvmtiObjectReferenceKind = u32;
+
 pub const jvmtiIterationControl_JVMTI_ITERATION_CONTINUE: jvmtiIterationControl = 1;
 pub const jvmtiIterationControl_JVMTI_ITERATION_IGNORE: jvmtiIterationControl = 2;
 pub const jvmtiIterationControl_JVMTI_ITERATION_ABORT: jvmtiIterationControl = 0;
+
 pub type jvmtiIterationControl = u32;
+
 pub const JVMTI_CLASS_STATUS_VERIFIED: _bindgen_ty_7 = 1;
 pub const JVMTI_CLASS_STATUS_PREPARED: _bindgen_ty_7 = 2;
 pub const JVMTI_CLASS_STATUS_INITIALIZED: _bindgen_ty_7 = 4;
 pub const JVMTI_CLASS_STATUS_ERROR: _bindgen_ty_7 = 8;
 pub const JVMTI_CLASS_STATUS_ARRAY: _bindgen_ty_7 = 16;
 pub const JVMTI_CLASS_STATUS_PRIMITIVE: _bindgen_ty_7 = 32;
+
 pub type _bindgen_ty_7 = u32;
+
 pub const jvmtiEventMode_JVMTI_ENABLE: jvmtiEventMode = 1;
 pub const jvmtiEventMode_JVMTI_DISABLE: jvmtiEventMode = 0;
+
 pub type jvmtiEventMode = u32;
+
 pub const jvmtiParamTypes_JVMTI_TYPE_JBYTE: jvmtiParamTypes = 101;
 pub const jvmtiParamTypes_JVMTI_TYPE_JCHAR: jvmtiParamTypes = 102;
 pub const jvmtiParamTypes_JVMTI_TYPE_JSHORT: jvmtiParamTypes = 103;
@@ -220,7 +170,9 @@ pub const jvmtiParamTypes_JVMTI_TYPE_JMETHODID: jvmtiParamTypes = 114;
 pub const jvmtiParamTypes_JVMTI_TYPE_CCHAR: jvmtiParamTypes = 115;
 pub const jvmtiParamTypes_JVMTI_TYPE_CVOID: jvmtiParamTypes = 116;
 pub const jvmtiParamTypes_JVMTI_TYPE_JNIENV: jvmtiParamTypes = 117;
+
 pub type jvmtiParamTypes = u32;
+
 pub const jvmtiParamKind_JVMTI_KIND_IN: jvmtiParamKind = 91;
 pub const jvmtiParamKind_JVMTI_KIND_IN_PTR: jvmtiParamKind = 92;
 pub const jvmtiParamKind_JVMTI_KIND_IN_BUF: jvmtiParamKind = 93;
@@ -228,42 +180,60 @@ pub const jvmtiParamKind_JVMTI_KIND_ALLOC_BUF: jvmtiParamKind = 94;
 pub const jvmtiParamKind_JVMTI_KIND_ALLOC_ALLOC_BUF: jvmtiParamKind = 95;
 pub const jvmtiParamKind_JVMTI_KIND_OUT: jvmtiParamKind = 96;
 pub const jvmtiParamKind_JVMTI_KIND_OUT_BUF: jvmtiParamKind = 97;
+
 pub type jvmtiParamKind = u32;
+
 pub const jvmtiTimerKind_JVMTI_TIMER_USER_CPU: jvmtiTimerKind = 30;
 pub const jvmtiTimerKind_JVMTI_TIMER_TOTAL_CPU: jvmtiTimerKind = 31;
 pub const jvmtiTimerKind_JVMTI_TIMER_ELAPSED: jvmtiTimerKind = 32;
+
 pub type jvmtiTimerKind = u32;
+
 pub const jvmtiPhase_JVMTI_PHASE_ONLOAD: jvmtiPhase = 1;
 pub const jvmtiPhase_JVMTI_PHASE_PRIMORDIAL: jvmtiPhase = 2;
 pub const jvmtiPhase_JVMTI_PHASE_START: jvmtiPhase = 6;
 pub const jvmtiPhase_JVMTI_PHASE_LIVE: jvmtiPhase = 4;
 pub const jvmtiPhase_JVMTI_PHASE_DEAD: jvmtiPhase = 8;
+
 pub type jvmtiPhase = u32;
+
 pub const JVMTI_VERSION_INTERFACE_JNI: _bindgen_ty_8 = 0;
 pub const JVMTI_VERSION_INTERFACE_JVMTI: _bindgen_ty_8 = 805306368;
+
 pub type _bindgen_ty_8 = u32;
+
 pub const JVMTI_VERSION_MASK_INTERFACE_TYPE: _bindgen_ty_9 = 1879048192;
 pub const JVMTI_VERSION_MASK_MAJOR: _bindgen_ty_9 = 268369920;
 pub const JVMTI_VERSION_MASK_MINOR: _bindgen_ty_9 = 65280;
 pub const JVMTI_VERSION_MASK_MICRO: _bindgen_ty_9 = 255;
+
 pub type _bindgen_ty_9 = u32;
+
 pub const JVMTI_VERSION_SHIFT_MAJOR: _bindgen_ty_10 = 16;
 pub const JVMTI_VERSION_SHIFT_MINOR: _bindgen_ty_10 = 8;
 pub const JVMTI_VERSION_SHIFT_MICRO: _bindgen_ty_10 = 0;
+
 pub type _bindgen_ty_10 = u32;
+
 pub const jvmtiVerboseFlag_JVMTI_VERBOSE_OTHER: jvmtiVerboseFlag = 0;
 pub const jvmtiVerboseFlag_JVMTI_VERBOSE_GC: jvmtiVerboseFlag = 1;
 pub const jvmtiVerboseFlag_JVMTI_VERBOSE_CLASS: jvmtiVerboseFlag = 2;
 pub const jvmtiVerboseFlag_JVMTI_VERBOSE_JNI: jvmtiVerboseFlag = 4;
+
 pub type jvmtiVerboseFlag = u32;
+
 pub const jvmtiJlocationFormat_JVMTI_JLOCATION_JVMBCI: jvmtiJlocationFormat = 1;
 pub const jvmtiJlocationFormat_JVMTI_JLOCATION_MACHINEPC: jvmtiJlocationFormat = 2;
 pub const jvmtiJlocationFormat_JVMTI_JLOCATION_OTHER: jvmtiJlocationFormat = 0;
+
 pub type jvmtiJlocationFormat = u32;
+
 pub const JVMTI_RESOURCE_EXHAUSTED_OOM_ERROR: _bindgen_ty_11 = 1;
 pub const JVMTI_RESOURCE_EXHAUSTED_JAVA_HEAP: _bindgen_ty_11 = 2;
 pub const JVMTI_RESOURCE_EXHAUSTED_THREADS: _bindgen_ty_11 = 4;
+
 pub type _bindgen_ty_11 = u32;
+
 pub const jvmtiError_JVMTI_ERROR_NONE: jvmtiError = 0;
 pub const jvmtiError_JVMTI_ERROR_INVALID_THREAD: jvmtiError = 10;
 pub const jvmtiError_JVMTI_ERROR_INVALID_THREAD_GROUP: jvmtiError = 11;
@@ -314,7 +284,9 @@ pub const jvmtiError_JVMTI_ERROR_INTERNAL: jvmtiError = 113;
 pub const jvmtiError_JVMTI_ERROR_UNATTACHED_THREAD: jvmtiError = 115;
 pub const jvmtiError_JVMTI_ERROR_INVALID_ENVIRONMENT: jvmtiError = 116;
 pub const jvmtiError_JVMTI_ERROR_MAX: jvmtiError = 116;
+
 pub type jvmtiError = u32;
+
 pub const jvmtiEvent_JVMTI_MIN_EVENT_TYPE_VAL: jvmtiEvent = 50;
 pub const jvmtiEvent_JVMTI_EVENT_VM_INIT: jvmtiEvent = 50;
 pub const jvmtiEvent_JVMTI_EVENT_VM_DEATH: jvmtiEvent = 51;
@@ -348,6 +320,7 @@ pub const jvmtiEvent_JVMTI_EVENT_GARBAGE_COLLECTION_FINISH: jvmtiEvent = 82;
 pub const jvmtiEvent_JVMTI_EVENT_OBJECT_FREE: jvmtiEvent = 83;
 pub const jvmtiEvent_JVMTI_EVENT_VM_OBJECT_ALLOC: jvmtiEvent = 84;
 pub const jvmtiEvent_JVMTI_MAX_EVENT_TYPE_VAL: jvmtiEvent = 84;
+
 pub type jvmtiEvent = u32;
 pub type jvmtiThreadInfo = _jvmtiThreadInfo;
 pub type jvmtiMonitorStackDepthInfo = _jvmtiMonitorStackDepthInfo;
@@ -478,6 +451,7 @@ pub type jvmtiExtensionFunction =
 ::std::option::Option<unsafe extern "C" fn(jvmti_env: *mut jvmtiEnv, ...) -> jvmtiError>;
 pub type jvmtiExtensionEvent =
 ::std::option::Option<unsafe extern "C" fn(jvmti_env: *mut jvmtiEnv, ...)>;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiThreadInfo {
@@ -487,12 +461,14 @@ pub struct _jvmtiThreadInfo {
 	pub thread_group: jthreadGroup,
 	pub context_class_loader: jobject,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiMonitorStackDepthInfo {
 	pub monitor: jobject,
 	pub stack_depth: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiThreadGroupInfo {
@@ -501,12 +477,14 @@ pub struct _jvmtiThreadGroupInfo {
 	pub max_priority: jint,
 	pub is_daemon: jboolean,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiFrameInfo {
 	pub method: jmethodID,
 	pub location: jlocation,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiStackInfo {
@@ -515,21 +493,25 @@ pub struct _jvmtiStackInfo {
 	pub frame_buffer: *mut jvmtiFrameInfo,
 	pub frame_count: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoField {
 	pub index: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoArray {
 	pub index: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoConstantPool {
 	pub index: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoStackLocal {
@@ -540,6 +522,7 @@ pub struct _jvmtiHeapReferenceInfoStackLocal {
 	pub location: jlocation,
 	pub slot: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoJniLocal {
@@ -548,6 +531,7 @@ pub struct _jvmtiHeapReferenceInfoJniLocal {
 	pub depth: jint,
 	pub method: jmethodID,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapReferenceInfoReserved {
@@ -560,6 +544,7 @@ pub struct _jvmtiHeapReferenceInfoReserved {
 	pub reserved7: jlong,
 	pub reserved8: jlong,
 }
+
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union _jvmtiHeapReferenceInfo {
@@ -571,6 +556,7 @@ pub union _jvmtiHeapReferenceInfo {
 	pub other: jvmtiHeapReferenceInfoReserved,
 	_bindgen_union_align: [u64; 8usize],
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiHeapCallbacks {
@@ -591,6 +577,7 @@ pub struct _jvmtiHeapCallbacks {
 	pub reserved14: jvmtiReservedCallback,
 	pub reserved15: jvmtiReservedCallback,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiClassDefinition {
@@ -598,6 +585,7 @@ pub struct _jvmtiClassDefinition {
 	pub class_byte_count: jint,
 	pub class_bytes: *const ::std::os::raw::c_uchar,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiMonitorUsage {
@@ -608,12 +596,14 @@ pub struct _jvmtiMonitorUsage {
 	pub notify_waiter_count: jint,
 	pub notify_waiters: *mut jthread,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiLineNumberEntry {
 	pub start_location: jlocation,
 	pub line_number: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiLocalVariableEntry {
@@ -624,6 +614,7 @@ pub struct _jvmtiLocalVariableEntry {
 	pub generic_signature: *mut ::std::os::raw::c_char,
 	pub slot: jint,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiParamInfo {
@@ -632,6 +623,7 @@ pub struct _jvmtiParamInfo {
 	pub base_type: jvmtiParamTypes,
 	pub null_ok: jboolean,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiExtensionFunctionInfo {
@@ -643,6 +635,7 @@ pub struct _jvmtiExtensionFunctionInfo {
 	pub error_count: jint,
 	pub errors: *mut jvmtiError,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiExtensionEventInfo {
@@ -652,6 +645,7 @@ pub struct _jvmtiExtensionEventInfo {
 	pub param_count: jint,
 	pub params: *mut jvmtiParamInfo,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiTimerInfo {
@@ -662,18 +656,21 @@ pub struct _jvmtiTimerInfo {
 	pub reserved1: jlong,
 	pub reserved2: jlong,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiAddrLocationMap {
 	pub start_address: *const ::std::os::raw::c_void,
 	pub location: jlocation,
 }
+
 #[repr(C)]
 #[repr(align(4))]
 #[derive(Debug, Copy, Clone)]
 pub struct jvmtiCapabilities {
 	pub _bitfield_1: __BindgenBitfieldUnit<[u8; 16usize], u8>,
 }
+
 impl jvmtiCapabilities {
 	#[inline]
 	pub fn can_tag_objects(&self) -> ::std::os::raw::c_uint {
@@ -1378,6 +1375,7 @@ impl jvmtiCapabilities {
 		__bindgen_bitfield_unit
 	}
 }
+
 pub type jvmtiEventReserved = ::std::option::Option<unsafe extern "C" fn()>;
 pub type jvmtiEventBreakpoint = ::std::option::Option<
 	unsafe extern "C" fn(
@@ -1612,6 +1610,7 @@ pub type jvmtiEventVMObjectAlloc = ::std::option::Option<
 >;
 pub type jvmtiEventVMStart =
 ::std::option::Option<unsafe extern "C" fn(jvmti_env: *mut jvmtiEnv, jni_env: *mut JNIEnv)>;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct jvmtiEventCallbacks {
@@ -1651,6 +1650,7 @@ pub struct jvmtiEventCallbacks {
 	pub ObjectFree: jvmtiEventObjectFree,
 	pub VMObjectAlloc: jvmtiEventVMObjectAlloc,
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct jvmtiInterface_1_ {
@@ -2561,13 +2561,17 @@ pub struct jvmtiInterface_1_ {
 		) -> jvmtiError,
 	>,
 }
+
 pub type jvmtiInterface_1 = jvmtiInterface_1_;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _jvmtiEnv {
 	pub functions: *const jvmtiInterface_1_,
 }
+
 pub type __builtin_va_list = [__va_list_tag; 1usize];
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __va_list_tag {

@@ -1,3 +1,8 @@
+mod debugger_detector;
+mod anti_launch_args;
+mod jvm;
+mod bitfield;
+mod jmm;
 mod anti_thread;
 mod hwid;
 mod utils;
@@ -10,7 +15,7 @@ use jni::{JNIEnv};
 use jni::objects::{JClass, JString, JObject, GlobalRef, ReleaseMode, JValue};
 use jni::sys::{JavaVM, JNI_VERSION_1_8, JNI_OK, jint, jobject, jclass, JNINativeInterface_, jlong};
 use std::ffi::CStr;
-use crate::jvmti::{jvmtiEnv, JVMTI_VERSION_1_2, jvmtiCapabilities, jvmtiError_JVMTI_ERROR_NONE, jvmtiEventCallbacks, jvmtiEventMode_JVMTI_ENABLE, jvmtiEvent_JVMTI_EVENT_CLASS_FILE_LOAD_HOOK, jvmtiEvent_JVMTI_EVENT_THREAD_START, jthread, jvmtiThreadInfo};
+use crate::jvmti::{jvmtiEnv, JVMTI_VERSION_1_2, jvmtiCapabilities, jvmtiError_JVMTI_ERROR_NONE, jvmtiEventCallbacks, jvmtiEventMode_JVMTI_ENABLE, jvmtiEvent_JVMTI_EVENT_CLASS_FILE_LOAD_HOOK, jvmtiEvent_JVMTI_EVENT_THREAD_START, jthread};
 use std::ptr::{null_mut};
 use std::os::raw::{c_void, c_int, c_uchar, c_char};
 use std::mem::{zeroed, size_of};
@@ -18,13 +23,16 @@ use obfstr::{obfstr};
 use jni::strings::{JNIString, JNIStr};
 use jni::signature::JavaType;
 use crate::anti_thread::{on_thread_start, shutdown_attach_listener};
+use anti_launch_args::anti_launch_args;
+use crate::debugger_detector::check_debugger;
+use crate::jvm::JVM_ClassDepth;
 
 static mut G_BYTEMAP_REF: Option<GlobalRef> = None;
 
 
 #[no_mangle]
 pub unsafe extern "system" fn JNI_OnLoad(_vm: *mut JavaVM, _reserved: &mut c_void) -> c_int {
-	let _penv_ptr: *mut *mut c_void = &mut (null_mut() as *mut c_void) as *mut *mut c_void;
+	
 	JNI_VERSION_1_8
 }
 
@@ -75,6 +83,14 @@ pub unsafe extern "system" fn Java_me_cookiedragon234_falcon_NativeAccessor_b(
 	if str.is_null() {
 		println!("{}", obfstr!("Raion is quitting..."));
 		std::process::exit(1);
+	}
+	
+	if !_class_loader.is_null() {
+		anti_launch_args(env.get_native_interface());
+	}
+	if check_debugger() {
+		println!("{}", obfstr!("[RAION] Please do not attach a debugger - this incident has been reported"));
+		return
 	}
 	
 	let chars = env.get_string_utf_chars(str).unwrap();
@@ -161,6 +177,7 @@ pub unsafe extern "C" fn load_hook_handler(
 	if bytes.is_null() {
 		return;
 	}
+	println!("Begin Succ {}", CStr::from_ptr(name).to_str().unwrap());
 	
 	let byte_num = env.get_array_length(bytes.into_inner()).unwrap();
 	let c_bytes = env.get_byte_array_elements(bytes.into_inner()).unwrap().0;
@@ -180,6 +197,8 @@ pub unsafe extern "C" fn load_hook_handler(
 	}
 	
 	env.release_byte_array_elements(bytes.into_inner(), &mut *c_bytes, ReleaseMode::NoCopyBack).unwrap();
+	
+	println!("End Succ {}", CStr::from_ptr(name).to_str().unwrap());
 }
 
 

@@ -164,9 +164,9 @@ dependencies = [
 
 [[package]]
 name = "obfstr"
-version = "0.1.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fde677a726bbf8effc101af04b80e7c9464f5dc50fe28bc40c3d530facb899f"
+checksum = "43a32982fced7de6834f4583fde19da2db188afbb4ba57bea6f024f7bf40c542"
 dependencies = [
  "obfstr-impl",
 ]

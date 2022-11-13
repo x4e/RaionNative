@@ -11,7 +11,7 @@ crate_type = ["cdylib"]
 [dependencies]
 libc = "0.2.7"
 jni = "0.17.0"
-obfstr = "0.1.1"
+obfstr = "0.4.1"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.6"
